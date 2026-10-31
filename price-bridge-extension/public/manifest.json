@@ -1,6 +1,6 @@
 {
-  "name": "Chrome React Extension",
-  "description": "Template for creating Crome extensions with React",
+  "name": "Price Bridge Extension",
+  "description": "This extension allows you find the best prices.",
   "version": "1.0",
   "manifest_version": 3,
   "action": {

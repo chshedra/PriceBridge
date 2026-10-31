@@ -24,11 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder
-    .Services.AddScoped<MarketplaceItemService>()
-    .AddScoped<LinkProcessor>()
-    .AddScoped<LocalizationService>()
-    .AddSingleton<BrowserHolder>();
+builder.Services.AddScoped<MarketplaceItemService>().AddScoped<LocalizationService>();
 
 var app = builder.Build();
 

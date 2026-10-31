@@ -14,9 +14,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <button onClick={getPrice}>Get Price</button>
-      </header>
+      <button onClick={getPrice}>Get Price</button>
     </div>
   );
 }

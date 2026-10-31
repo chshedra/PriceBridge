@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
     api
       .post("/api/items/", body)
-      .then((response) => {
+      .then(() => {
         sendResponse({ ok: true });
       })
       .catch((error) => {
