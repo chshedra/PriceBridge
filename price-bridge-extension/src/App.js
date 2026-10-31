@@ -35,13 +35,36 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={getPrice} disabled={loading}>
+      <header className="header">
+        <h1>
+          Price<span>Bridge</span>
+        </h1>
+      </header>
+
+      <button className="primary-button" onClick={getPrice} disabled={loading}>
         {loading ? "Searching..." : "Get Price"}
       </button>
 
       {error && <p className="error">{error}</p>}
 
-      {!loading && !error && items.length === 0 && <p>No results yet</p>}
+      {!loading && !error && items.length === 0 && (
+        <p className="empty">No results yet</p>
+      )}
+
+      {loading && (
+        <div className="items" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="skeleton-row">
+              <div className="skeleton skeleton-image" />
+              <div className="skeleton-lines">
+                <div className="skeleton skeleton-line" />
+                <div className="skeleton skeleton-line short" />
+              </div>
+              <div className="skeleton skeleton-price" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <ul className="items">
         {items.map((item) => (
@@ -54,6 +77,7 @@ function App() {
                   {item.price} {item.currency}
                 </span>
               )}
+              <span className="chevron">›</span>
             </a>
           </li>
         ))}
