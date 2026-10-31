@@ -17,10 +17,22 @@ public static class Routes
 
         builder.MapPost(
             "/api/items",
-            ([FromBody] OzonProductDto product) =>
+            async ([FromBody] OzonProductDto product, [FromServices] TaobaoClient taobaoClient) =>
+            {
                 Console.WriteLine(
                     $"Received product: {product.Sku}, {product.Title}, {product.Price}, {product.OriginalPrice}, {product.Image}, {product.Availability}, {product.Url}"
-                )
+                );
+
+                if (string.IsNullOrEmpty(product.Image))
+                    return Results.BadRequest("Product image is required");
+
+                var items = await taobaoClient.SearchByImage(product.Image);
+                Console.WriteLine(
+                    $"Found {items.Count} Taobao items, top: {items.FirstOrDefault()?.Url}"
+                );
+
+                return Results.Ok(items);
+            }
         );
     }
 }

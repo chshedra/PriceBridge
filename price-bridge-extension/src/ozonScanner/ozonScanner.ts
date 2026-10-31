@@ -8,6 +8,15 @@ export interface OzonProductDto {
   url: string;
 }
 
+export interface TaobaoItemDto {
+  itemId?: string;
+  title?: string;
+  price?: number;
+  currency: string;
+  image?: string;
+  url: string;
+}
+
 export function getOzonProduct(): OzonProductDto | null {
   const raw = document
     .querySelector('div[id^="state-webAspects-"]')

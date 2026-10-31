@@ -1,7 +1,7 @@
 import axios from "axios";
-import { OzonProductDto } from "../ozonScanner/ozonScanner";
+import { OzonProductDto, TaobaoItemDto } from "../ozonScanner/ozonScanner";
 
-const api = axios.create({ baseURL: "http://localhost:5000", adapter: "fetch" });
+const api = axios.create({ baseURL: "http://localhost:5050", adapter: "fetch" });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "SAVE_PRICE") {
@@ -16,9 +16,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       url: message.url,
     };
     api
-      .post("/api/items/", body)
-      .then(() => {
-        sendResponse({ ok: true });
+      .post<TaobaoItemDto[]>("/api/items/", body)
+      .then((response) => {
+        sendResponse({ ok: true, items: response.data });
       })
       .catch((error) => {
         console.error("API Error:", error);

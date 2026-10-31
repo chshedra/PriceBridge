@@ -26,6 +26,14 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<MarketplaceItemService>().AddScoped<LocalizationService>();
 
+builder.Services.AddHttpClient<TaobaoClient>(client =>
+{
+    var host = builder.Configuration["RapidApi:TaobaoHost"] ?? "taobao-datahub.p.rapidapi.com";
+    client.BaseAddress = new Uri($"https://{host}/");
+    client.DefaultRequestHeaders.Add("x-rapidapi-host", host);
+    client.DefaultRequestHeaders.Add("x-rapidapi-key", builder.Configuration["RapidApi:Key"]);
+});
+
 var app = builder.Build();
 
 app.UseCors("Extension");
