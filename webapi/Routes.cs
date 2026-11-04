@@ -17,7 +17,10 @@ public static class Routes
 
         builder.MapPost(
             "/api/items",
-            async ([FromBody] OzonProductDto product, [FromServices] TaobaoClient taobaoClient) =>
+            async (
+                [FromBody] OzonProductDto product,
+                [FromServices] TaobaoSearchService taobaoSearchService
+            ) =>
             {
                 Console.WriteLine(
                     $"Received product: {product.Sku}, {product.Title}, {product.Price}, {product.OriginalPrice}, {product.Image}, {product.Availability}, {product.Url}"
@@ -26,7 +29,7 @@ public static class Routes
                 if (string.IsNullOrEmpty(product.Image))
                     return Results.BadRequest("Product image is required");
 
-                var items = await taobaoClient.SearchByImage(product.Image);
+                var items = await taobaoSearchService.FindSimilar(product);
                 Console.WriteLine(
                     $"Found {items.Count} Taobao items, top: {items.FirstOrDefault()?.Url}"
                 );

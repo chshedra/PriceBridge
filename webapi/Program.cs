@@ -19,12 +19,15 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
 );
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<MarketplaceItemService>().AddScoped<LocalizationService>();
+builder
+    .Services.AddScoped<MarketplaceItemService>()
+    .AddScoped<LocalizationService>()
+    .AddScoped<TaobaoSearchService>();
 
 builder.Services.AddHttpClient<TaobaoClient>(client =>
 {
