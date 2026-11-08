@@ -27,7 +27,19 @@ builder.Services.AddSwaggerGen();
 builder
     .Services.AddScoped<MarketplaceItemService>()
     .AddScoped<LocalizationService>()
-    .AddScoped<TaobaoSearchService>();
+    .AddScoped<TaobaoSearchService>()
+    .AddScoped<AlibabaTranslationService>();
+
+builder.Services.AddSingleton(_ => new AlibabaCloud.SDK.Alimt20181012.Client(
+    new AlibabaCloud.OpenApiClient.Models.Config
+    {
+        AccessKeyId = builder.Configuration["AlibabaCloud:Id"],
+        AccessKeySecret = builder.Configuration["AlibabaCloud:Secret"],
+        Endpoint =
+            builder.Configuration["AlibabaCloud:TranslationEndpoint"]
+            ?? "mt.cn-hangzhou.aliyuncs.com",
+    }
+));
 
 builder.Services.AddHttpClient<TaobaoClient>(client =>
 {

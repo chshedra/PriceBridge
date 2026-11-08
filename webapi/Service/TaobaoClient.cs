@@ -31,6 +31,7 @@ public class TaobaoClient(HttpClient httpClient)
             .Select(item => new TaobaoItemDto(
                 ItemId: GetString(item, "itemId"),
                 Title: GetString(item, "title"),
+                TranslatedTitle: null,
                 Price: GetPrice(item),
                 Currency: currency,
                 Image: ToAbsoluteUrl(GetString(item, "image")),

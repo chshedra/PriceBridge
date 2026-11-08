@@ -96,6 +96,9 @@ namespace PriceBridge.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<string>("TranslatedTitle")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OzonProductId");

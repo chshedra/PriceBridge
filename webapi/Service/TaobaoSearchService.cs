@@ -8,10 +8,12 @@ namespace PriceBridge.Service;
 /// </summary>
 /// <param name="db">The database context.</param>
 /// <param name="taobaoClient">The Taobao client.</param>
+/// <param name="localizationService">The localization service.</param>
 /// <param name="configuration">The configuration.</param>
 public class TaobaoSearchService(
     AppDbContext db,
     TaobaoClient taobaoClient,
+    LocalizationService localizationService,
     IConfiguration configuration
 )
 {
@@ -29,11 +31,19 @@ public class TaobaoSearchService(
             Console.WriteLine(
                 $"Serving {ozonProduct.TaobaoProducts.Count} Taobao items for SKU {product.Sku} from DB"
             );
+            await TranslateMissingTitles(ozonProduct.TaobaoProducts);
             return ozonProduct.TaobaoProducts.Select(ToDto).ToList();
         }
 
         var items = await taobaoClient.SearchByImage(product.Image!);
         Console.WriteLine($"Fetched {items.Count} Taobao items for SKU {product.Sku} from API");
+
+        var translatedTitles = await localizationService.ToEnglish(
+            items.Select(i => i.Title).ToList()
+        );
+        items = items
+            .Select((item, i) => item with { TranslatedTitle = translatedTitles[i] })
+            .ToList();
 
         if (ozonProduct == null)
         {
@@ -56,10 +66,31 @@ public class TaobaoSearchService(
         return items;
     }
 
+    // Products cached before translation was introduced (or when it failed) have no translated title
+    private async Task TranslateMissingTitles(ICollection<TaobaoProduct> products)
+    {
+        var untranslated = products
+            .Where(p => p.TranslatedTitle == null && !string.IsNullOrWhiteSpace(p.Title))
+            .ToList();
+
+        if (untranslated.Count == 0)
+            return;
+
+        var translatedTitles = await localizationService.ToEnglish(
+            untranslated.Select(p => p.Title).ToList()
+        );
+
+        for (var i = 0; i < untranslated.Count; i++)
+            untranslated[i].TranslatedTitle = translatedTitles[i];
+
+        await db.SaveChangesAsync();
+    }
+
     private static TaobaoItemDto ToDto(TaobaoProduct t) =>
         new(
             ItemId: t.ItemId,
             Title: t.Title,
+            TranslatedTitle: t.TranslatedTitle,
             Price: t.Price,
             Currency: t.Currency,
             Image: t.ImageUrl,
@@ -71,6 +102,7 @@ public class TaobaoSearchService(
         {
             ItemId = item.ItemId,
             Title = item.Title,
+            TranslatedTitle = item.TranslatedTitle,
             Price = item.Price,
             Currency = item.Currency,
             ImageUrl = item.Image,

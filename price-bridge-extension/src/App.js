@@ -71,7 +71,7 @@ function App() {
           <li key={item.url}>
             <a href={item.url} target="_blank" rel="noreferrer">
               {item.image && <img src={item.image} alt="" />}
-              <span className="title">{item.title}</span>
+              <span className="title">{item.translatedTitle ?? item.title}</span>
               {item.price != null && (
                 <span className="price">
                   {item.price} {item.currency}
