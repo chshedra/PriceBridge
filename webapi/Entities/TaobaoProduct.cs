@@ -10,6 +10,7 @@ public class TaobaoProduct
     public required string Currency { get; set; }
     public string? ImageUrl { get; set; }
     public required string ItemUrl { get; set; }
+    public string? MatchSource { get; set; }
 
     public int OzonProductId { get; set; }
     public OzonProduct OzonProduct { get; set; } = null!;

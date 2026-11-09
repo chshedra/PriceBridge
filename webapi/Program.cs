@@ -28,7 +28,8 @@ builder
     .Services.AddScoped<MarketplaceItemService>()
     .AddScoped<LocalizationService>()
     .AddScoped<TaobaoSearchService>()
-    .AddScoped<AlibabaTranslationService>();
+    .AddScoped<AlibabaTranslationService>()
+    .AddScoped<SearchQueryBuilder>();
 
 builder.Services.AddSingleton(_ => new AlibabaCloud.SDK.Alimt20181012.Client(
     new AlibabaCloud.OpenApiClient.Models.Config

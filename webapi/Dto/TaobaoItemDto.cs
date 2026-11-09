@@ -5,5 +5,6 @@ public record TaobaoItemDto(
     decimal? Price,
     string Currency,
     string? Image,
-    string Url
+    string Url,
+    string? MatchSource = null
 );

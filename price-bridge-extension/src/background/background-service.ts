@@ -9,9 +9,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const body: OzonProductDto = {
       sku: message.sku,
       title: message.title,
+      brand: message.brand,
+      category: message.category,
+      characteristics: message.characteristics,
       price: message.price,
       originalPrice: message.originalPrice,
-      image: message.image,
+      images: message.images,
       availability: message.availability,
       url: message.url,
     };

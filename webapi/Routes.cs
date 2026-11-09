@@ -23,11 +23,11 @@ public static class Routes
             ) =>
             {
                 Console.WriteLine(
-                    $"Received product: {product.Sku}, {product.Title}, {product.Price}, {product.OriginalPrice}, {product.Image}, {product.Availability}, {product.Url}"
+                    $"Received product: {product.Sku}, {product.Title}, {product.Price}, {product.OriginalPrice}, {string.Join(", ", product.Images ?? [])}, {product.Availability}, {product.Url}"
                 );
 
-                if (string.IsNullOrEmpty(product.Image))
-                    return Results.BadRequest("Product image is required");
+                if (product.Images is not { Count: > 0 } && product.Category is not { Count: > 0 })
+                    return Results.BadRequest("Product image or category is required");
 
                 var items = await taobaoSearchService.FindSimilar(product);
                 Console.WriteLine(

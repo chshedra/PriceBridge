@@ -1,7 +1,8 @@
 namespace PriceBridge.Service;
 
 /// <summary>
-/// Localizes texts coming from marketplaces into English.
+/// Localizes texts between marketplaces: Chinese Taobao texts into English,
+/// Russian Ozon texts into Chinese.
 /// </summary>
 /// <param name="translationService">The translation service.</param>
 public class LocalizationService(AlibabaTranslationService translationService)
@@ -9,7 +10,20 @@ public class LocalizationService(AlibabaTranslationService translationService)
     /// <summary>
     /// Translates Chinese texts into English. Returns null for texts that could not be translated.
     /// </summary>
-    public async Task<List<string?>> ToEnglish(IReadOnlyList<string?> texts)
+    public Task<List<string?>> ToEnglish(IReadOnlyList<string?> texts) =>
+        Translate(texts, sourceLanguage: "zh", targetLanguage: "en");
+
+    /// <summary>
+    /// Translates Russian texts into Chinese. Returns null for texts that could not be translated.
+    /// </summary>
+    public Task<List<string?>> ToChinese(IReadOnlyList<string?> texts) =>
+        Translate(texts, sourceLanguage: "ru", targetLanguage: "zh");
+
+    private async Task<List<string?>> Translate(
+        IReadOnlyList<string?> texts,
+        string sourceLanguage,
+        string targetLanguage
+    )
     {
         var result = new string?[texts.Count];
         var toTranslate = texts
@@ -24,8 +38,8 @@ public class LocalizationService(AlibabaTranslationService translationService)
         {
             var translated = await translationService.Translate(
                 toTranslate.Select(x => x.text!).ToList(),
-                sourceLanguage: "zh",
-                targetLanguage: "en"
+                sourceLanguage,
+                targetLanguage
             );
 
             for (var i = 0; i < toTranslate.Count; i++)

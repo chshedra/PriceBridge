@@ -6,11 +6,26 @@ namespace PriceBridge.Service;
 public class TaobaoClient(HttpClient httpClient)
 {
     // item_search_image_x returns only encrypted ids, so use the endpoint that includes itemUrl
-    public async Task<List<TaobaoItemDto>> SearchByImage(string imageUrl, int pageSize = 20)
-    {
-        var query =
-            $"item_search_image_2?imgUrl={Uri.EscapeDataString(imageUrl)}&pageSize={pageSize}";
+    public Task<List<TaobaoItemDto>> SearchByImage(string imageUrl, int pageSize = 20) =>
+        Search($"item_search_image_2?imgUrl={Uri.EscapeDataString(imageUrl)}&pageSize={pageSize}");
 
+    public Task<List<TaobaoItemDto>> SearchByKeyword(
+        string query,
+        decimal? startPrice = null,
+        decimal? endPrice = null
+    )
+    {
+        var url = $"item_search?q={Uri.EscapeDataString(query)}&page=1";
+        if (startPrice != null)
+            url += $"&startPrice={startPrice.Value.ToString("0", CultureInfo.InvariantCulture)}";
+        if (endPrice != null)
+            url += $"&endPrice={endPrice.Value.ToString("0", CultureInfo.InvariantCulture)}";
+
+        return Search(url);
+    }
+
+    private async Task<List<TaobaoItemDto>> Search(string query)
+    {
         using var response = await httpClient.GetAsync(query);
         response.EnsureSuccessStatusCode();
 
@@ -18,6 +33,16 @@ public class TaobaoClient(HttpClient httpClient)
         Console.WriteLine($"Taobao search response: {json}");
 
         var result = json.GetProperty("result");
+
+        // Errors such as "no results" or "unsupported image format" still come back as HTTP 200
+        if (result.TryGetProperty("status", out var status) && GetString(status, "data") == "error")
+        {
+            Console.WriteLine(
+                $"Taobao {query.Split('?')[0]} returned error: {(status.TryGetProperty("msg", out var msg) ? msg : status)}"
+            );
+            return [];
+        }
+
         var currency = result.TryGetProperty("settings", out var settings)
             ? GetString(settings, "currency") ?? "CNY"
             : "CNY";
